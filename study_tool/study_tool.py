@@ -1,47 +1,72 @@
 import openpyxl
+import re
 
-# Define the filename of the Excel file
-file_name = "study_tool.xlsx"
+def keyword_search():
+    # Define the filename of the Excel file
+    file_name = "study_tool.xlsx"
 
-# Get user input for the keyword
-keyword = input("Enter the keyword to search for: ")
+    # Get user input for the keyword
+    print()  # Blank line added
+    keyword = input("Enter the keyword to search for: ")
 
-# Open the Excel file
-try:
-    workbook = openpyxl.load_workbook(file_name)
-    sheet = workbook.active
+    # Prepare a regular expression pattern for the keyword as a whole word
+    pattern = r'\b' + re.escape(keyword) + r'\b'
 
-    # Initialize a list to store matching rows
-    matching_rows = []
+    # Open the Excel file
+    try:
+        workbook = openpyxl.load_workbook(file_name)
+        sheet = workbook.active
 
-    # Initialize headers
-    headers = None
+        # Initialize a list to store matching rows
+        matching_rows = []
 
-    # Iterate through each row in the sheet
-    for row in sheet.iter_rows(values_only=True):
-        if not headers:
-            headers = row  # First row is assumed to be the headers
-            continue
+        # Initialize headers
+        headers = None
 
-        # Check if the keyword is in any of the cells in the row
-        if any(cell is not None and keyword in str(cell) for cell in row):
-            matching_rows.append(row)
+        # Iterate through each row in the sheet
+        for row in sheet.iter_rows(values_only=True):
+            if not headers:
+                headers = row  # First row is assumed to be the headers
+                continue
 
-    # Display the matching rows with values in separate rows
-    if matching_rows:
-        for row in matching_rows:
-            if any(cell is not None for cell in row):
-                for header, cell in zip(headers, row):
-                    if cell is not None:
-                        print(f"{header}: {cell}")
-                print()
+            # Check if the keyword (case-insensitive, whole word) is in any of the cells in the row
+            if any(cell is not None and re.search(pattern, str(cell), re.I) for cell in row):
+                matching_rows.append(row)
+
+        # Display the matching rows with values in separate rows
+        if matching_rows:
+            print()  # Blank line added
+            for row in matching_rows:
+                if any(cell is not None for cell in row):
+                    for header, cell in zip(headers, row):
+                        if cell is not None:
+                            print(f"{header}: {cell}")
+                    print()
+        else:
+            print("No matching rows found for the keyword.")
+
+        # Close the Excel file
+        workbook.close()
+
+    except FileNotFoundError:
+        print(f"File '{file_name}' not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+# Menu loop
+while True:
+    print("Menu:")
+    print("1. Keyword Search")
+    print("2. Additional Feature (Not implemented yet)")
+    print("3. Exit\n")  # Added '\n' to create a blank line
+    choice = input("Select an option (1/2/3): ")
+
+    if choice == '1':
+        keyword_search()
+    elif choice == '2':
+        print("This feature is not implemented yet.")
+    elif choice == '3':
+        print("Exiting the script. Goodbye!")
+        break
     else:
-        print("No matching rows found for the keyword.")
-
-    # Close the Excel file
-    workbook.close()
-
-except FileNotFoundError:
-    print(f"File '{file_name}' not found.")
-except Exception as e:
-    print(f"An error occurred: {e}")
+        print("Invalid choice. Please select a valid option (1/2/3).")
