@@ -8,6 +8,7 @@ def keyword_search():
     # Get user input for the keyword
     print()  # Blank line added
     keyword = input("Enter the keyword to search for: ")
+    print()  # Blank line added
 
     # Prepare a regular expression pattern for the keyword as a whole word
     pattern = r'\b' + re.escape(keyword) + r'\b'
@@ -30,8 +31,11 @@ def keyword_search():
                 continue
 
             # Check if the keyword (case-insensitive, whole word) is in any of the cells in the row
-            if any(cell is not None and re.search(pattern, str(cell), re.I) for cell in row):
-                matching_rows.append(row)
+            if any(cell is not None for cell in row):
+                for cell in row:
+                    if cell is not None and re.search(pattern, str(cell), re.I):
+                        matching_rows.append(row)
+                        break
 
         # Display the matching rows with values in separate rows
         if matching_rows:
@@ -55,18 +59,20 @@ def keyword_search():
 
 # Menu loop
 while True:
-    print("Menu:")
-    print("1. Keyword Search")
-    print("2. Additional Feature (Not implemented yet)")
-    print("3. Exit\n")  # Added '\n' to create a blank line
+    print("\nSelect an Option:")
+    print("  1. Keyword Search")  # Added blank space
+    print("  2. Additional Feature (Not implemented yet)")
+    print("  3. Exit")  # Added blank space
+    print()  # Blank line added
     choice = input("Select an option (1/2/3): ")
+    print()  # Blank line added
 
     if choice == '1':
         keyword_search()
     elif choice == '2':
         print("This feature is not implemented yet.")
     elif choice == '3':
-        print("Exiting the script. Goodbye!")
+        print("Exiting the script. Goodbye!\n")  # Blank line added
         break
     else:
         print("Invalid choice. Please select a valid option (1/2/3).")
