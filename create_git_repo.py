@@ -1,7 +1,6 @@
 import subprocess
 import os
 import shutil
-import sys
 
 def list_files_in_directory(directory):
     files = [file for file in os.listdir(directory) if os.path.isfile(os.path.join(directory, file))]
@@ -10,13 +9,13 @@ def list_files_in_directory(directory):
     return files
 
 def create_git_repository(repo_name, selected_file):
-    repo_dir = "/srv/repo_dir"  # Specify the target directory
-    repo_path = os.path.join(repo_dir, repo_name)
+    cwd = os.getcwd()  # Get the current working directory
+    repo_path = os.path.join(cwd, repo_name)  # Use CWD as the repository directory
 
     if os.path.exists(repo_path):
         print(f"Repository '{repo_name}' already exists in this directory.")
     else:
-        os.makedirs(repo_path)  # Create the target directory if it doesn't exist
+        os.makedirs(repo_path)  # Create the repository directory if it doesn't exist
         subprocess.run(["git", "init", repo_path])
 
         # Set Git global username and email programmatically
@@ -26,7 +25,7 @@ def create_git_repository(repo_name, selected_file):
         print(f"Repository '{repo_name}' created successfully.")
 
         # Automatically copy the selected file to the repository
-        src_file_path = os.path.join("/srv", selected_file)
+        src_file_path = os.path.join(cwd, selected_file)  # Use CWD as the source directory
         dst_file_path = os.path.join(repo_path, selected_file)
         shutil.copy(src_file_path, dst_file_path)
         print(f"File '{selected_file}' added to the repository.")
@@ -38,13 +37,20 @@ def create_git_repository(repo_name, selected_file):
             md_file.write(f"# {repo_name}\n")  # Add repository name as the first line
 
             # Read the script file and copy comment lines to the markdown file
-            script_file_path = os.path.join("/srv", selected_file)
+            script_file_path = os.path.join(cwd, selected_file)  # Use CWD as the source directory
             with open(script_file_path, "r") as script_file:
                 for line in script_file:
                     if line.strip().startswith("#"):
                         md_file.write(line)
 
         print(f"Markdown file '{md_file_name}' created in the repository.")
+
+        # Copy files with the same base name (ignoring the extension) to the repository
+        selected_file_base = os.path.splitext(selected_file)[0]
+        for file in os.listdir(cwd):
+            if os.path.isfile(os.path.join(cwd, file)) and os.path.splitext(file)[0] == selected_file_base:
+                shutil.copy(os.path.join(cwd, file), os.path.join(repo_path, file))
+                print(f"File '{file}' with the same base name copied to the repository.")
 
         commit_message = input("Enter the commit message (max 150 characters): ")
         if len(commit_message) > 150:
@@ -57,7 +63,7 @@ def create_git_repository(repo_name, selected_file):
         print(f"Changes committed with the message: '{commit_message}'")
 
 if __name__ == "__main__":
-    files = list_files_in_directory("/srv")
+    files = list_files_in_directory(os.getcwd())  # List files in the current working directory (CWD)
     choice = input("Choose the file that you are creating a repository for (enter the number): ")
     try:
         choice = int(choice)
