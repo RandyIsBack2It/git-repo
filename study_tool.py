@@ -45,11 +45,51 @@ def keyword_search():
     except Exception as e:
         print(f"An error occurred: {e}")
 
+# Function for spellcheck feature (Option 2)
+def spellcheck():
+    file_name = "study_tool.xlsx"  # Define the Excel file name
+
+    keyword = input("Enter a keyword to find matching words: ").lower()
+    print()  # Add a blank line here
+
+    try:
+        workbook = openpyxl.load_workbook(file_name)  # Open the Excel file
+        sheet = workbook.active
+
+        words = set()  # Use a set to store unique words
+        for row in sheet.iter_rows(values_only=True):
+            for cell in row:
+                if cell is not None:
+                    words_in_cell = cell.split()  # Split the cell content into individual words
+                    for word in words_in_cell:
+                        word = word.strip(",.!?")  # Remove common punctuation marks
+                        if len(word) >= 2 and word[0].lower() == keyword[0] and word[-1].lower() == keyword[-1]:
+                            words.add(word.lower())  # Store words in lowercase to ensure uniqueness
+
+        if words:
+            # Sort the words by the number of common letters
+            words = sorted(words, key=lambda x: sum(1 for a, b in zip(x, keyword) if a == b), reverse=True)
+
+            # Display the words
+            print("\nMatching words (sorted by common letters):")
+            for word in words:
+                print(word)
+            print()
+        else:
+            print("No matching words found for the given criteria.")
+
+        workbook.close()  # Close the Excel file
+
+    except FileNotFoundError:
+        print(f"File '{file_name}' not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 # Main menu loop
 while True:
     print("\nSelect an Option:")
     print("  1. Keyword Search")
-    print("  2. Additional Feature (Not implemented yet)")
+    print("  2. Spellcheck")
     print("  3. Exit")
     print()  # Add a blank line
     choice = input("Select an option (1/2/3): ")  # Get the user's choice
@@ -58,7 +98,7 @@ while True:
     if choice == '1':
         keyword_search()  # Call the keyword_search function for option 1
     elif choice == '2':
-        print("This feature is not implemented yet.")  # Display a message for option 2
+        spellcheck()  # Call the spellcheck function for option 2
     elif choice == '3':
         print("Exiting the script. Goodbye!")  # Display a goodbye message
         print()  # Add a blank line here
