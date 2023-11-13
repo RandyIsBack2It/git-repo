@@ -37,6 +37,13 @@ def keyword_search():
             print()  # Add a blank line here
         else:
             print("No matching rows found for the keyword.")
+        
+        run_again = input("Do you want to run Keyword Search again? (y/N): ").strip().lower()
+        if run_again == 'y':
+            print()  # Add a line break before rerunning the function
+            keyword_search()
+        else:
+            return  # Return to the main menu
 
         workbook.close()  # Close the Excel file
 
@@ -77,6 +84,13 @@ def spellcheck():
             print()
         else:
             print("No matching words found for the given criteria.")
+        
+        run_again = input("Do you want to run Spellcheck again? (y/N): ").strip().lower()
+        if run_again == 'y':
+            print()  # Add a line break before rerunning the function
+            spellcheck()
+        else:
+            return  # Return to the main menu
 
         workbook.close()  # Close the Excel file
 
@@ -90,9 +104,9 @@ while True:
     print("\nSelect an Option:")
     print("  1. Keyword Search")
     print("  2. Spellcheck")
-    print("  3. Exit")
+    print("  3. Exit (Default)")
     print()  # Add a blank line
-    choice = input("Select an option (1/2/3): ")  # Get the user's choice
+    choice = input("Select an option (1/2/3): ").strip() or '3'  # Get the user's choice, default to '3' if Enter is pressed
     print()  # Add a blank line here
 
     if choice == '1':
@@ -104,4 +118,4 @@ while True:
         print()  # Add a blank line here
         break
     else:
-        print("Invalid choice. Please select a valid option (1/2/3).")  # Display an error message for invalid choices
+        print
